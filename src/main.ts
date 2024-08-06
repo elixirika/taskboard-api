@@ -15,8 +15,11 @@ app.use(bodyParser.json());
 
 interface Task {
   id: string;
-  title: string;
-  isDone: boolean;
+  taskTitle: string;
+  taskDesc: string;
+  startDate: Date;
+  endDate: Date;
+  status: string;
 }
 
 app.get('/tasks', async (_req: Request, res: Response) => {

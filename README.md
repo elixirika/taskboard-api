@@ -65,8 +65,12 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
         [
           {
             "id": "task-id",
-            "title": "Task Title",
-            "isDone": false
+            "taskTitle": "Task Title",
+            "taskDesc": "Task Description",
+            "status": "Done", //   - Not Started/In Progress/Done/On Hold/Unassigned
+            "startDate": null,
+            "endDate": null,
+            "previousStatus": null
           }
         ]
         ```
@@ -79,19 +83,18 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
 
         ```json
         {
-          "title": "Task Title",
-          "isDone": false
+          "taskTitle": "Task Title",            
+          "taskDesc": "Task Description",          
+          "status": "Unassigned", //   - Not Started/In Progress/Done/On Hold/Unassigned
+          "startDate": null,
+          "endDate": null,
         }
         ```
 
     - **Response:**
 
         ```json
-        {
-          "id": "task-id",
-          "title": "Task Title",
-          "isDone": false
-        }
+        {}
         ```
 
 - **Update a task**
@@ -102,8 +105,7 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
 
         ```json
         {
-          "title": "Updated Task Title",
-          "isDone": true
+          "taskTitle": "Updated Task Title",
         }
         ```
 
