@@ -22,7 +22,7 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
 
     ```bash
     git clone https://github.com/elixirika/taskboard-api.git
-    cd express-tasks
+    cd taskboard-api
     ```
 
 2. **Install dependencies:**
