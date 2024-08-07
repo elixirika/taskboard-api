@@ -1,4 +1,4 @@
-import Express, { Request, Response } from 'express';
+import Express, { Request, Response, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import { v4 as uuid } from 'uuid';
 
@@ -22,43 +22,81 @@ interface Task {
   status: string;
 }
 
+// Global error handling middleware
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err.message);
+  res.status(500).json({ error: 'An unexpected error occurred' });
+});
+
 app.get('/tasks', async (_req: Request, res: Response) => {
-  const db = await getDB();
-  res.send(db.data.tasks);
+  try {
+    const db = await getDB();
+    res.send(db.data.tasks);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to retrieve tasks' });
+  }
 });
 
 app.post('/tasks', async (req: Request, res: Response) => {
-  const task: Task = req.body;
-  const db = await getDB();
+  try {
+    const task: Task = req.body;
+    const db = await getDB();
 
-  task.id = uuid();
-  db.data.tasks.push(task);
+    // Validate task data
+    if (!task.taskTitle || !task.taskDesc) {
+      return res.status(400).json({ error: 'Invalid task data\n Title and Description are required.' });
+    }
 
-  await db.write();
-  res.send(task);
+    task.id = uuid();
+    db.data.tasks.push(task);
+
+    await db.write();
+    res.status(201).json(task);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create task' });
+  }
 });
 
 app.put('/tasks/:taskId', async (req: Request, res: Response) => {
-  const db = await getDB();
-  const payload: Task = req.body;
-  const taskId = req.params.taskId;
+  try {
+    const db = await getDB();
+    const payload: Task = req.body;
+    const taskId = req.params.taskId;
 
-  db.data.tasks = db.data.tasks.map(task =>
-    task.id === taskId ? { ...task, ...payload } : task
-  );
+    // Validate task data
+    if (!payload.taskTitle || !payload.taskDesc ) {
+      return res.status(400).json({ error: 'Invalid task data\n Title and Description are required.' });
+    }
 
-  await db.write();
-  res.send({});
+    const taskIndex = db.data.tasks.findIndex(task => task.id === taskId);
+    if (taskIndex === -1) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    db.data.tasks[taskIndex] = { ...db.data.tasks[taskIndex], ...payload };
+    await db.write();
+    res.send({});
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update task' });
+  }
 });
 
 app.delete('/tasks/:taskId', async (req: Request, res: Response) => {
-  const db = await getDB();
-  const taskId = req.params.taskId;
+  try {
+    const db = await getDB();
+    const taskId = req.params.taskId;
 
-  db.data.tasks = db.data.tasks.filter(task => task.id !== taskId);
+    const taskIndex = db.data.tasks.findIndex(task => task.id === taskId);
+    if (taskIndex === -1) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
 
-  await db.write();
-  res.send({});
+    db.data.tasks.splice(taskIndex, 1);
+    await db.write();
+    res.send({});
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete task' });
+  }
 });
 
 app.listen(4000, () => {
