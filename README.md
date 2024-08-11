@@ -1,13 +1,12 @@
 # Express Tasks API
 
-A simple REST API built with Express and TypeScript for managing tasks. This API uses `lowdb` as a lightweight JSON database to store task data.
+A simple REST API built with Express and TypeScript for managing tasks and task lists. This API uses `lowdb` as a lightweight JSON database to store task data.
 
 ## Features
 
-- Create tasks
-- Read tasks
-- Update tasks
-- Delete tasks
+- Create, Read, Update, Delete (CRUD) tasks
+- Create, Read, Update, Delete (CRUD) task lists
+- Manage tasks within task lists
 
 ## Getting Started
 
@@ -39,7 +38,8 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
 
     ```json
     {
-      "tasks": []
+      "tasks": [],
+      "taskLists": []
     }
     ```
 
@@ -51,9 +51,11 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
     yarn start
     ```
 
-    The server will start and listen on port 4000.
+    The server will start and listen on port 9000.
 
 ### API Endpoints
+
+#### Tasks
 
 - **Get all tasks**
 
@@ -87,14 +89,21 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
           "taskDesc": "Task Description",          
           "status": "Unassigned", //   - Not Started/In Progress/Done/On Hold/Unassigned
           "startDate": null,
-          "endDate": null,
+          "endDate": null
         }
         ```
 
     - **Response:**
 
         ```json
-        {}
+        {
+          "id": "task-id",
+          "taskTitle": "Task Title",
+          "taskDesc": "Task Description",
+          "status": "Unassigned",
+          "startDate": null,
+          "endDate": null
+        }
         ```
 
 - **Update a task**
@@ -105,7 +114,7 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
 
         ```json
         {
-          "taskTitle": "Updated Task Title",
+          "taskTitle": "Updated Task Title"
         }
         ```
 
@@ -118,6 +127,102 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
 - **Delete a task**
 
     - `DELETE /tasks/:taskId`
+
+    - **Response:**
+
+        ```json
+        {}
+        ```
+
+#### Task Lists
+
+- **Get all task lists**
+
+    - `GET /tasklists`
+
+    - **Response:**
+
+        ```json
+        [
+          {
+            "id": "list-id",
+            "listTitle": "Task List Title",
+            "subtasks": [
+              {
+                "id": "task-id",
+                "taskTitle": "Task Title",
+                "taskDesc": "Task Description",
+                "status": "Done", //   - Not Started/In Progress/Done/On Hold/Unassigned
+                "startDate": null,
+                "endDate": null,
+                "previousStatus": null
+              }
+            ]
+          }
+        ]
+        ```
+
+- **Create a task list**
+
+    - `POST /tasklists`
+
+    - **Request Body:**
+
+        ```json
+        {
+          "listTitle": "Task List Title",
+          "subtasks": [
+            {
+              "taskTitle": "Task Title",
+              "taskDesc": "Task Description",
+              "status": "Unassigned",
+              "startDate": null,
+              "endDate": null
+            }
+          ]
+        }
+        ```
+
+    - **Response:**
+
+        ```json
+        {
+          "id": "list-id",
+          "listTitle": "Task List Title",
+          "subtasks": [
+            {
+              "id": "task-id",
+              "taskTitle": "Task Title",
+              "taskDesc": "Task Description",
+              "status": "Unassigned",
+              "startDate": null,
+              "endDate": null
+            }
+          ]
+        }
+        ```
+
+- **Update a task list**
+
+    - `PUT /tasklists/:listId`
+
+    - **Request Body:**
+
+        ```json
+        {
+          "listTitle": "Updated Task List Title"
+        }
+        ```
+
+    - **Response:**
+
+        ```json
+        {}
+        ```
+
+- **Delete a task list**
+
+    - `DELETE /tasklists/:listId`
 
     - **Response:**
 
@@ -142,6 +247,7 @@ A simple REST API built with Express and TypeScript for managing tasks. This API
     # or
     yarn test
     ```
+
 ---
 
 Thank you for checking out the Express Tasks API!
