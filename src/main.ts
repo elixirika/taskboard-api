@@ -16,7 +16,7 @@ const app = Express();
 
 app.use(bodyParser.json());
 
-interface Task {
+interface Task { // Unlisted
   id: string;
   taskTitle: string;
   taskDesc: string;
@@ -25,10 +25,17 @@ interface Task {
   status: string;
 }
 
+interface Subtask { // Created from TaskList
+  id: string;
+  taskTitle: string;
+  taskDesc: string;
+  status: string;
+}
+
 interface TaskList {
   id: string;
   listTitle: string;
-  subtasks?: Task[];
+  subtasks?: Subtask[];
 }
 
 // Global error handling middleware
@@ -54,11 +61,9 @@ app.post("/tasks", async (req: Request, res: Response) => {
 
     // Validate task data
     if (!task.taskTitle || !task.taskDesc) {
-      return res
-        .status(400)
-        .json({
-          error: "Invalid task data\n Title and Description are required.",
-        });
+      return res.status(400).json({
+        error: "Invalid task data\n Title and Description are required.",
+      });
     }
 
     task.id = uuid();
@@ -79,11 +84,9 @@ app.put("/tasks/:taskId", async (req: Request, res: Response) => {
 
     // Validate task data
     if (!payload.taskTitle || !payload.taskDesc) {
-      return res
-        .status(400)
-        .json({
-          error: "Invalid task data\n Title and Description are required.",
-        });
+      return res.status(400).json({
+        error: "Invalid task data\n Title and Description are required.",
+      });
     }
 
     const taskIndex = db.data.tasks.findIndex((task) => task.id === taskId);
@@ -145,14 +148,15 @@ app.post("/tasklists", async (req: Request, res: Response) => {
     if (taskList.subtasks) {
       taskList.subtasks.forEach((subtask) => {
         subtask.id = uuid();
-      });}
+      });
+    }
 
     db.data.taskLists.push(taskList);
 
     await db.write();
     res.status(201).json(taskList);
   } catch (err) {
-    res.status(500).json({ error:  err});
+    res.status(500).json({ error: err });
   }
 });
 
